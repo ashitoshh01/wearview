@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Product } from "@/data/products";
 import { useToast } from "@/components/ui/use-toast";
+import { Camera, CameraOff } from "lucide-react";
 
 interface VirtualTryonModalProps {
   product: Product | null;
@@ -27,6 +28,7 @@ export default function VirtualTryonModal({
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [overlayImage, setOverlayImage] = useState<HTMLImageElement | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
   
   // Load the overlay image
@@ -69,9 +71,10 @@ export default function VirtualTryonModal({
   }, [isCameraActive, overlayImage]);
   
   const startCamera = async () => {
+    setIsProcessing(true);
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
+        video: { facingMode: "user" },
         audio: false,
       });
       
@@ -87,6 +90,8 @@ export default function VirtualTryonModal({
         description: "Please enable camera access to use virtual try-on",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
   
@@ -118,14 +123,29 @@ export default function VirtualTryonModal({
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     
     // Calculate overlay position (centered in middle of frame)
-    const overlayWidth = canvas.width * 0.5; // Scale overlay to 50% of canvas width
+    const overlayWidth = canvas.width * 0.6; // Scale overlay to 60% of canvas width
     const overlayHeight = (overlayImage.height / overlayImage.width) * overlayWidth;
     
-    const x = (canvas.width - overlayWidth) / 2;
-    const y = (canvas.height - overlayHeight) / 2;
+    // Position for different product categories
+    let xOffset = 0;
+    let yOffset = 0;
+    
+    if (product?.category === 'glasses') {
+      // Position glasses on face (higher up)
+      xOffset = (canvas.width - overlayWidth) / 2;
+      yOffset = canvas.height * 0.2; // Position at upper 20% of screen
+    } else if (product?.category === 'accessories') {
+      // Position accessories centrally
+      xOffset = (canvas.width - overlayWidth) / 2;
+      yOffset = canvas.height * 0.3;
+    } else {
+      // Default position for shirts, hoodies, jackets
+      xOffset = (canvas.width - overlayWidth) / 2;
+      yOffset = canvas.height * 0.35;
+    }
     
     // Draw overlay
-    ctx.drawImage(overlayImage, x, y, overlayWidth, overlayHeight);
+    ctx.drawImage(overlayImage, xOffset, yOffset, overlayWidth, overlayHeight);
     
     // Add instruction text
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -149,7 +169,7 @@ export default function VirtualTryonModal({
             autoPlay 
             playsInline 
             muted 
-            className="absolute inset-0 w-full h-full object-cover hidden"
+            className={`absolute inset-0 w-full h-full object-cover ${isCameraActive ? 'hidden' : ''}`}
           />
           <canvas 
             ref={canvasRef} 
@@ -158,13 +178,26 @@ export default function VirtualTryonModal({
           
           {!isCameraActive && (
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <Button onClick={startCamera}>Enable Camera</Button>
+              <Button onClick={startCamera} disabled={isProcessing}>
+                {isProcessing ? (
+                  "Accessing camera..."
+                ) : (
+                  <>
+                    <Camera className="mr-2 h-4 w-4" /> Enable Camera
+                  </>
+                )}
+              </Button>
             </div>
           )}
         </div>
         
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          {isCameraActive && (
+            <Button variant="outline" onClick={stopCamera} className="sm:mr-auto">
+              <CameraOff className="mr-2 h-4 w-4" /> Turn Off Camera
+            </Button>
+          )}
+          <Button variant="default" onClick={onClose}>
             Close
           </Button>
         </DialogFooter>
