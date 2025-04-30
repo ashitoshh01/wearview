@@ -40,80 +40,59 @@ export default function FloatingObjects({ className = '' }: FloatingObjectsProps
     const shapes: THREE.Mesh[] = [];
     
     // Create a sphere
-    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
     const sphereMaterial = new THREE.MeshPhongMaterial({
       color: 0x9b87f5,
       shininess: 100,
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sphere.position.set(-15, 8, -5);
+    sphere.position.set(-15, 8, 0);
     scene.add(sphere);
     shapes.push(sphere);
     
     // Create a cube
-    const cubeGeometry = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+    const cubeGeometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
     const cubeMaterial = new THREE.MeshPhongMaterial({
       color: 0x8a2be2,
       shininess: 100,
     });
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    cube.position.set(10, 5, -3);
+    cube.position.set(10, 5, 2);
     scene.add(cube);
     shapes.push(cube);
     
     // Create a torus
-    const torusGeometry = new THREE.TorusGeometry(0.8, 0.3, 16, 100);
+    const torusGeometry = new THREE.TorusGeometry(1.5, 0.5, 16, 100);
     const torusMaterial = new THREE.MeshPhongMaterial({
       color: 0x6e42ff,
       shininess: 100,
     });
     const torus = new THREE.Mesh(torusGeometry, torusMaterial);
-    torus.position.set(-10, -8, -2);
+    torus.position.set(-10, -8, 5);
     scene.add(torus);
     shapes.push(torus);
     
     // Create a cone
-    const coneGeometry = new THREE.ConeGeometry(0.8, 1.5, 32);
+    const coneGeometry = new THREE.ConeGeometry(1.5, 3, 32);
     const coneMaterial = new THREE.MeshPhongMaterial({
       color: 0xb19cd9,
       shininess: 100,
     });
     const cone = new THREE.Mesh(coneGeometry, coneMaterial);
-    cone.position.set(15, -6, -4);
+    cone.position.set(15, -6, 0);
     scene.add(cone);
     shapes.push(cone);
     
     // Create a dodecahedron
-    const dodecahedronGeometry = new THREE.DodecahedronGeometry(1);
+    const dodecahedronGeometry = new THREE.DodecahedronGeometry(2);
     const dodecahedronMaterial = new THREE.MeshPhongMaterial({
       color: 0x9370db,
       shininess: 100,
     });
     const dodecahedron = new THREE.Mesh(dodecahedronGeometry, dodecahedronMaterial);
-    dodecahedron.position.set(0, 12, -5);
+    dodecahedron.position.set(0, 12, 0);
     scene.add(dodecahedron);
     shapes.push(dodecahedron);
-    
-    // Additional shapes to match the reference image
-    const octahedronGeometry = new THREE.OctahedronGeometry(0.8);
-    const octahedronMaterial = new THREE.MeshPhongMaterial({
-      color: 0xb19cd9,
-      shininess: 100,
-    });
-    const octahedron = new THREE.Mesh(octahedronGeometry, octahedronMaterial);
-    octahedron.position.set(-18, -5, -3);
-    scene.add(octahedron);
-    shapes.push(octahedron);
-    
-    const tetrahedronGeometry = new THREE.TetrahedronGeometry(0.9);
-    const tetrahedronMaterial = new THREE.MeshPhongMaterial({
-      color: 0x8a2be2,
-      shininess: 100,
-    });
-    const tetrahedron = new THREE.Mesh(tetrahedronGeometry, tetrahedronMaterial);
-    tetrahedron.position.set(18, 8, -4);
-    scene.add(tetrahedron);
-    shapes.push(tetrahedron);
     
     // Add ambient light
     const ambientLight = new THREE.AmbientLight(0x404040);
