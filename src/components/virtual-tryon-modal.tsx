@@ -7,6 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Product } from "@/data/products";
 import { useToast } from "@/components/ui/use-toast";
@@ -115,9 +116,12 @@ export default function VirtualTryonModal({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Set canvas dimensions
+    // Set canvas dimensions to match video dimensions for proper display
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
+    
+    // Clear canvas before drawing
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Draw video frame
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
@@ -161,6 +165,9 @@ export default function VirtualTryonModal({
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Virtual Try-On: {product?.name}</DialogTitle>
+          <DialogDescription>
+            Use your camera to see how this item looks on you
+          </DialogDescription>
         </DialogHeader>
         
         <div className="relative aspect-video bg-muted rounded-md overflow-hidden">
@@ -169,15 +176,15 @@ export default function VirtualTryonModal({
             autoPlay 
             playsInline 
             muted 
-            className={`absolute inset-0 w-full h-full object-cover ${isCameraActive ? 'hidden' : ''}`}
+            className="absolute inset-0 w-full h-full object-cover"
           />
           <canvas 
             ref={canvasRef} 
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover z-10"
           />
           
           {!isCameraActive && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
               <Button onClick={startCamera} disabled={isProcessing}>
                 {isProcessing ? (
                   "Accessing camera..."
