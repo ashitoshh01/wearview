@@ -1,41 +1,44 @@
 
 import { Button } from "@/components/ui/button";
-import Floating3DObject from "./3d-object";
+import FloatingObjects from "./floating-objects";
 
 export default function HeroSection() {
   return (
-    <section id="home" className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-hero-gradient dark:bg-hero-gradient-dark -z-10" />
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbC1vcGFjaXR5PSIuMDUiIGZpbGw9IiNGRkYiIGN4PSI1MCIgY3k9IjUwIiByPSIxIi8+PC9nPjwvc3ZnPg==')] opacity-20 -z-10" />
+    <section id="home" className="relative overflow-hidden py-20 md:py-32">
+      {/* Dark background with gradient */}
+      <div className="absolute inset-0 bg-[#1a0933] -z-20" />
       
-      <div className="container min-h-[90vh] flex flex-col md:flex-row items-center justify-between py-20">
-        <div className="flex-1 space-y-8 text-center md:text-left pb-8 md:pb-0">
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
-            Virtual Try-On
+      {/* Floating objects */}
+      <FloatingObjects />
+      
+      <div className="container min-h-[80vh] flex flex-col items-center justify-center text-center z-10">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-white">
+            Try Before You Buy,
             <br />
-            <span className="heading-gradient">Next Generation</span>
+            <span className="text-purple-400">Virtually</span>
           </h1>
           
-          <p className="text-lg text-muted-foreground max-w-md mx-auto md:mx-0">
-            Experience the future of online shopping with our advanced 
-            virtual try-on technology. See how products look on you before you buy.
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Experience clothes in a whole new dimension with our revolutionary
+            virtual try-on technology.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <Button size="lg" asChild>
-              <a href="#shop">Try Now</a>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8" asChild>
+              <a href="#shop">Try It Now</a>
             </Button>
-            <Button size="lg" variant="outline" asChild>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8" asChild>
               <a href="#features">Learn More</a>
             </Button>
           </div>
         </div>
-        
-        <div className="flex-1 flex justify-center">
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-blue-500 opacity-20 rounded-full blur-3xl animate-pulse-slow"></div>
-            <Floating3DObject className="animate-float" />
-          </div>
+      </div>
+      
+      {/* Scroll indicator */}
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+        <div className="w-8 h-12 border-2 border-white rounded-full flex justify-center">
+          <div className="w-1 h-3 bg-white rounded-full mt-2 animate-bounce" />
         </div>
       </div>
     </section>
