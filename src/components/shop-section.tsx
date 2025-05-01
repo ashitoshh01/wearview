@@ -4,7 +4,7 @@ import { products, Product } from "@/data/products";
 import ProductCard from "./product-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type Category = 'all' | 'shirts' | 'pants' | 'accessories' | 'glasses' | 'hoodies' | 'jackets';
+type Category = 'all' | 'shirts' | 'pants' | 'accessories' | 'hoodies' | 'jackets' | 'sets';
 
 export default function ShopSection() {
   const [activeCategory, setActiveCategory] = useState<Category>('all');
@@ -13,10 +13,10 @@ export default function ShopSection() {
     { value: 'all', label: 'All Products' },
     { value: 'shirts', label: 'Shirts' },
     { value: 'pants', label: 'Pants' },
-    { value: 'accessories', label: 'Accessories' },
-    { value: 'glasses', label: 'Glasses' },
     { value: 'hoodies', label: 'Hoodies' },
     { value: 'jackets', label: 'Jackets' },
+    { value: 'accessories', label: 'Accessories' },
+    { value: 'sets', label: 'Sets' }
   ];
   
   // Filter products by category and limit to 8 items

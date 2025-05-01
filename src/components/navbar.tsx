@@ -31,9 +31,11 @@ export default function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <a href="#" className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-violet-500">
-              TryonVerse
-            </span>
+            <img 
+              src="/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png" 
+              alt="WearView Logo" 
+              className="h-8" 
+            />
           </a>
         </div>
         
