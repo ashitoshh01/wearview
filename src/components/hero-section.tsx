@@ -1,119 +1,15 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
-import { useEffect, useRef } from 'react';
 import { useTheme } from "./theme-provider";
 
 export default function HeroSection() {
-  // Reference for floating elements canvas
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme } = useTheme();
-
-  // Animation for floating elements
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set canvas dimensions
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    // Particle configuration
-    const particles: {
-      x: number;
-      y: number;
-      size: number;
-      color: string;
-      speedX: number;
-      speedY: number;
-      opacity: number;
-    }[] = [];
-
-    // Create particles with different shapes
-    for (let i = 0; i < 15; i++) {
-      const particleColor = theme === 'dark' 
-        ? `rgba(196, 181, 253, ${Math.random() * 0.3 + 0.1})` 
-        : `rgba(196, 181, 253, ${Math.random() * 0.3 + 0.1})`;
-        
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 30 + 15, // Reduced size
-        color: particleColor,
-        speedX: Math.random() * 0.5 - 0.25,
-        speedY: Math.random() * 0.5 - 0.25,
-        opacity: Math.random() * 0.5 + 0.1
-      });
-    }
-
-    // Animation loop
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw and update particles
-      particles.forEach(particle => {
-        ctx.save();
-        ctx.globalAlpha = particle.opacity;
-        ctx.fillStyle = particle.color;
-        
-        // Randomly choose between circle and rounded rectangle
-        if (Math.random() > 0.5) {
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          ctx.beginPath();
-          roundedRect(ctx, particle.x - particle.size/2, particle.y - particle.size/2, particle.size, particle.size, 10);
-          ctx.fill();
-        }
-        
-        ctx.restore();
-        
-        // Update position
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        
-        // Bounce off edges
-        if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
-        if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
-      });
-      
-      requestAnimationFrame(animate);
-    };
-    
-    // Helper function for rounded rectangles
-    function roundedRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
-      context.beginPath();
-      context.moveTo(x + radius, y);
-      context.arcTo(x + width, y, x + width, y + height, radius);
-      context.arcTo(x + width, y + height, x, y + height, radius);
-      context.arcTo(x, y + height, x, y, radius);
-      context.arcTo(x, y, x + width, y, radius);
-      context.closePath();
-    }
-    
-    animate();
-    
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-    };
-  }, [theme]);
 
   return (
     <section id="home" className="relative overflow-hidden h-screen flex items-center">
       {/* Background based on theme */}
       <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-purple-950' : 'bg-gradient-to-br from-white to-purple-50'} -z-20 transition-colors duration-300`} />
-      
-      {/* Floating elements canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full -z-10"></canvas>
       
       <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center z-10">
         <div className="max-w-3xl mx-auto space-y-6">
