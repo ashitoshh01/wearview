@@ -19,9 +19,10 @@ export default function ShopSection() {
     { value: 'jackets', label: 'Jackets' },
   ];
   
+  // Filter products by category and limit to 8 items
   const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === activeCategory);
+    ? products.slice(0, 8) 
+    : products.filter(product => product.category === activeCategory).slice(0, 8);
 
   return (
     <section id="shop" className="py-16 bg-secondary/30">

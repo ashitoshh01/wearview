@@ -40,12 +40,12 @@ export default function HeroSection() {
         </div>
       </div>
       
-      {/* Scroll indicator - positioned with transform to be visible without scrolling */}
+      {/* Scroll indicator - with slower animation */}
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
         <div className={`w-10 h-14 border-2 ${theme === 'dark' ? 'border-gray-400' : 'border-gray-400'} rounded-full flex justify-center transition-colors duration-300`}>
-          <div className={`w-1.5 h-3 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'} rounded-full mt-2 animate-bounce transition-colors duration-300`} />
+          <div className={`w-1.5 h-3 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'} rounded-full mt-2 animate-pulse transition-colors duration-300`} style={{ animationDuration: '2s' }} />
         </div>
-        <ArrowDown className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} animate-bounce transition-colors duration-300`} />
+        <ArrowDown className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} animate-pulse transition-colors duration-300`} style={{ animationDuration: '2s' }} />
       </div>
     </section>
   );
