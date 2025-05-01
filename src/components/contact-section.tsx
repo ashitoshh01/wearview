@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useTheme } from "@/components/theme-provider";
 import {
   Form,
   FormControl,
@@ -27,6 +28,7 @@ const formSchema = z.object({
 export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { theme } = useTheme();
   
   // Define form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,19 +59,19 @@ export default function ContactSection() {
   }
   
   return (
-    <section id="contact" className="py-16 bg-gradient-to-br from-white to-purple-50">
+    <section id="contact" className={`py-16 ${theme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-purple-950' : 'bg-gradient-to-br from-white to-purple-50'} transition-colors duration-300`}>
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-3">Get In Touch</h2>
             <div className="w-20 h-1 bg-purple-600 mx-auto mb-6"></div>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} max-w-2xl mx-auto transition-colors duration-300`}>
               Have questions about our virtual try-on technology? We'd love to hear from you!
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="bg-white rounded-2xl shadow-lg p-8 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg p-8 transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl`}>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -77,12 +79,12 @@ export default function ContactSection() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Your Name</FormLabel>
+                        <FormLabel className={`${theme === 'dark' ? 'text-gray-200' : ''}`}>Your Name</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Enter your name" 
                             {...field} 
-                            className="rounded-lg border-gray-300 focus:ring-purple-500 focus:border-purple-500"
+                            className={`rounded-lg ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'} focus:ring-purple-500 focus:border-purple-500`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -95,13 +97,13 @@ export default function ContactSection() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel className={`${theme === 'dark' ? 'text-gray-200' : ''}`}>Email Address</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="your.email@example.com" 
                             type="email" 
                             {...field} 
-                            className="rounded-lg border-gray-300 focus:ring-purple-500 focus:border-purple-500"
+                            className={`rounded-lg ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'} focus:ring-purple-500 focus:border-purple-500`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -114,12 +116,12 @@ export default function ContactSection() {
                     name="subject"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Subject</FormLabel>
+                        <FormLabel className={`${theme === 'dark' ? 'text-gray-200' : ''}`}>Subject</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="What's this about?" 
                             {...field} 
-                            className="rounded-lg border-gray-300 focus:ring-purple-500 focus:border-purple-500"
+                            className={`rounded-lg ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'} focus:ring-purple-500 focus:border-purple-500`}
                           />
                         </FormControl>
                         <FormMessage />
@@ -132,11 +134,11 @@ export default function ContactSection() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Your Message</FormLabel>
+                        <FormLabel className={`${theme === 'dark' ? 'text-gray-200' : ''}`}>Your Message</FormLabel>
                         <FormControl>
                           <Textarea 
                             placeholder="Tell us what's on your mind..." 
-                            className="rounded-lg min-h-[120px] border-gray-300 focus:ring-purple-500 focus:border-purple-500"
+                            className={`rounded-lg min-h-[120px] ${theme === 'dark' ? 'border-gray-700' : 'border-gray-300'} focus:ring-purple-500 focus:border-purple-500`}
                             {...field}
                           />
                         </FormControl>

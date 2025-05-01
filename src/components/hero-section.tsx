@@ -2,10 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { ArrowDown } from "lucide-react";
 import { useEffect, useRef } from 'react';
+import { useTheme } from "./theme-provider";
 
 export default function HeroSection() {
   // Reference for floating elements canvas
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { theme } = useTheme();
 
   // Animation for floating elements
   useEffect(() => {
@@ -37,11 +39,15 @@ export default function HeroSection() {
 
     // Create particles with different shapes
     for (let i = 0; i < 15; i++) {
+      const particleColor = theme === 'dark' 
+        ? `rgba(196, 181, 253, ${Math.random() * 0.3 + 0.1})` 
+        : `rgba(196, 181, 253, ${Math.random() * 0.3 + 0.1})`;
+        
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 50 + 20,
-        color: `rgba(196, 181, 253, ${Math.random() * 0.3 + 0.1})`,
+        size: Math.random() * 30 + 15, // Reduced size
+        color: particleColor,
         speedX: Math.random() * 0.5 - 0.25,
         speedY: Math.random() * 0.5 - 0.25,
         opacity: Math.random() * 0.5 + 0.1
@@ -99,25 +105,25 @@ export default function HeroSection() {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, []);
+  }, [theme]);
 
   return (
     <section id="home" className="relative overflow-hidden h-screen flex items-center">
-      {/* Light mode background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white to-purple-50 -z-20" />
+      {/* Background based on theme */}
+      <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-purple-950' : 'bg-gradient-to-br from-white to-purple-50'} -z-20 transition-colors duration-300`} />
       
       {/* Floating elements canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full -z-10"></canvas>
       
       <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center z-10">
         <div className="max-w-3xl mx-auto space-y-6">
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-neutral-900">
+          <h1 className={`text-5xl md:text-7xl font-extrabold leading-tight ${theme === 'dark' ? 'text-white' : 'text-neutral-900'} transition-colors duration-300`}>
             Try Before You Buy,
             <br />
             <span className="text-purple-600">Virtually</span>
           </h1>
           
-          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
+          <p className={`text-xl ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} max-w-2xl mx-auto transition-colors duration-300`}>
             Experience clothes in a whole new dimension with our revolutionary
             virtual try-on technology.
           </p>
@@ -126,19 +132,24 @@ export default function HeroSection() {
             <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 rounded-full py-6" asChild>
               <a href="#shop">Try It Now</a>
             </Button>
-            <Button size="lg" variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100 text-lg px-8 rounded-full py-6" asChild>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className={`${theme === 'dark' ? 'border-gray-600 text-gray-300 hover:bg-gray-800' : 'border-gray-400 text-gray-700 hover:bg-gray-100'} text-lg px-8 rounded-full py-6 transition-colors duration-300`} 
+              asChild
+            >
               <a href="#features">Learn More</a>
             </Button>
           </div>
         </div>
       </div>
       
-      {/* Scroll indicator - positioned at bottom but visible without scrolling */}
+      {/* Scroll indicator - positioned with transform to be visible without scrolling */}
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-        <div className="w-10 h-14 border-2 border-gray-400 rounded-full flex justify-center">
-          <div className="w-1.5 h-3 bg-gray-400 rounded-full mt-2 animate-bounce" />
+        <div className={`w-10 h-14 border-2 ${theme === 'dark' ? 'border-gray-400' : 'border-gray-400'} rounded-full flex justify-center transition-colors duration-300`}>
+          <div className={`w-1.5 h-3 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'} rounded-full mt-2 animate-bounce transition-colors duration-300`} />
         </div>
-        <ArrowDown className="mt-2 text-gray-400 animate-bounce" />
+        <ArrowDown className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} animate-bounce transition-colors duration-300`} />
       </div>
     </section>
   );
