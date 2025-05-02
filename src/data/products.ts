@@ -38,8 +38,8 @@ export const products: Product[] = [
     name: "Palm Pattern Set",
     category: "sets",
     price: 3499,
-    imageSrc: "/lovable-uploads/340a34f0-e9ff-4e04-b814-c770e270e5d2.png",
-    virtualTryOnImage: "/lovable-uploads/340a34f0-e9ff-4e04-b814-c770e270e5d2.png"
+    imageSrc: "/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png",
+    virtualTryOnImage: "/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png"
   },
   {
     id: "shirt-1",
@@ -51,19 +51,11 @@ export const products: Product[] = [
   },
   {
     id: "accessories-1",
-    name: "Designer Watch",
+    name: "Designer Sunglasses",
     category: "accessories",
-    price: 4999,
-    imageSrc: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&q=80&w=500",
-    virtualTryOnImage: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&q=80&w=500"
-  },
-  {
-    id: "accessories-2",
-    name: "Leather Belt",
-    category: "accessories",
-    price: 1499,
-    imageSrc: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=500",
-    virtualTryOnImage: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=500"
+    price: 2999,
+    imageSrc: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80",
+    virtualTryOnImage: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
   },
   {
     id: "jacket-2",
@@ -72,5 +64,13 @@ export const products: Product[] = [
     price: 3999,
     imageSrc: "https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&q=80&w=500",
     virtualTryOnImage: "https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&q=80&w=500"
+  },
+  {
+    id: "shirt-2",
+    name: "Casual Shirt",
+    category: "shirts",
+    price: 1899,
+    imageSrc: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=500",
+    virtualTryOnImage: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=500"
   }
 ];

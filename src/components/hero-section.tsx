@@ -13,7 +13,7 @@ export default function HeroSection() {
       
       <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center z-10">
         <div className="max-w-3xl mx-auto space-y-6">
-          <h1 className={`text-5xl md:text-7xl font-extrabold leading-tight ${theme === 'dark' ? 'text-white' : 'text-neutral-900'} transition-colors duration-300`}>
+          <h1 className={`text-5xl md:text-7xl font-extrabold leading-tight pt-0 ${theme === 'dark' ? 'text-white' : 'text-neutral-900'} transition-colors duration-300`}>
             Try Before You Buy,
             <br />
             <span className="text-purple-600">Virtually</span>
@@ -25,7 +25,7 @@ export default function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 rounded-full py-6" asChild>
+            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 rounded-full py-6 animate-bounce" asChild>
               <a href="#shop">Try It Now</a>
             </Button>
             <Button 
@@ -41,11 +41,11 @@ export default function HeroSection() {
       </div>
       
       {/* Scroll indicator - with slower animation */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce" style={{ animationDuration: '3s' }}>
         <div className={`w-10 h-14 border-2 ${theme === 'dark' ? 'border-gray-400' : 'border-gray-400'} rounded-full flex justify-center transition-colors duration-300`}>
-          <div className={`w-1.5 h-3 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'} rounded-full mt-2 animate-pulse transition-colors duration-300`} style={{ animationDuration: '2s' }} />
+          <div className={`w-1.5 h-3 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'} rounded-full mt-2 transition-colors duration-300`} />
         </div>
-        <ArrowDown className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} animate-pulse transition-colors duration-300`} style={{ animationDuration: '2s' }} />
+        <ArrowDown className={`mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-400'} transition-colors duration-300`} />
       </div>
     </section>
   );

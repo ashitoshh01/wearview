@@ -7,8 +7,38 @@ import FeaturesSection from "@/components/features-section";
 import AboutSection from "@/components/about-section";
 import ContactSection from "@/components/contact-section";
 import Footer from "@/components/footer";
+import { useEffect } from "react";
 
 const Index = () => {
+  useEffect(() => {
+    // Add slide animation observer functionality
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+    
+    // Target all sections except hero (which is already visible)
+    const sections = document.querySelectorAll('section:not(#home)');
+    sections.forEach(section => {
+      section.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-1000');
+      observer.observe(section);
+    });
+
+    return () => {
+      sections.forEach(section => observer.unobserve(section));
+    };
+  }, []);
+
   return (
     <ThemeProvider defaultTheme="light">
       <div className="min-h-screen flex flex-col">
@@ -22,6 +52,12 @@ const Index = () => {
         </main>
         <Footer />
       </div>
+      <style jsx global>{`
+        .animate-in {
+          opacity: 1 !important;
+          transform: translateY(0) !important;
+        }
+      `}</style>
     </ThemeProvider>
   );
 };

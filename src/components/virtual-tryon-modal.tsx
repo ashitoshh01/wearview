@@ -123,8 +123,10 @@ export default function VirtualTryonModal({
     // Clear canvas before drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw video frame
+    // Draw video frame with reduced opacity
+    ctx.globalAlpha = 0.7; // Set opacity to 0.7 (70%)
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = 1.0; // Reset opacity for subsequent drawings
     
     // Calculate overlay position (centered in middle of frame)
     const overlayWidth = canvas.width * 0.6; // Scale overlay to 60% of canvas width
@@ -134,14 +136,10 @@ export default function VirtualTryonModal({
     let xOffset = 0;
     let yOffset = 0;
     
-    if (product?.category === 'glasses') {
-      // Position glasses on face (higher up)
+    if (product?.category === 'accessories') {
+      // Position accessories (including sunglasses) on face (higher up)
       xOffset = (canvas.width - overlayWidth) / 2;
       yOffset = canvas.height * 0.2; // Position at upper 20% of screen
-    } else if (product?.category === 'accessories') {
-      // Position accessories centrally
-      xOffset = (canvas.width - overlayWidth) / 2;
-      yOffset = canvas.height * 0.3;
     } else {
       // Default position for shirts, hoodies, jackets
       xOffset = (canvas.width - overlayWidth) / 2;
