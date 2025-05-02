@@ -11,7 +11,7 @@ export default function HeroSection() {
       {/* Background based on theme */}
       <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-purple-950' : 'bg-gradient-to-br from-white to-purple-50'} -z-20 transition-colors duration-300`} />
       
-      <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center z-10">
+      <div className="container mx-auto px-4 flex flex-col items-center justify-center text-center z-10 -mt-16">
         <div className="max-w-3xl mx-auto space-y-6">
           <h1 className={`text-5xl md:text-7xl font-extrabold leading-tight pt-0 ${theme === 'dark' ? 'text-white' : 'text-neutral-900'} transition-colors duration-300`}>
             Try Before You Buy,
@@ -40,7 +40,7 @@ export default function HeroSection() {
         </div>
       </div>
       
-      {/* Scroll indicator - with slower animation */}
+      {/* Scroll indicator - with 3s animation cycle */}
       <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center" style={{ animation: 'moveUpDown 3s ease-in-out infinite' }}>
         <div className={`w-10 h-14 border-2 ${theme === 'dark' ? 'border-gray-400' : 'border-gray-400'} rounded-full flex justify-center transition-colors duration-300`}>
           <div className={`w-1.5 h-3 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'} rounded-full mt-2 transition-colors duration-300`} />
