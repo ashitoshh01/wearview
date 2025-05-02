@@ -52,7 +52,7 @@ const Index = () => {
         </main>
         <Footer />
       </div>
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .animate-in {
           opacity: 1 !important;
           transform: translateY(0) !important;
@@ -65,7 +65,7 @@ const Index = () => {
             transform: translate(-50%, -15px);
           }
         }
-      `}</style>
+      `}} />
     </ThemeProvider>
   );
 };
