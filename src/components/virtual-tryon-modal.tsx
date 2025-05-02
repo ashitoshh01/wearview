@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -123,7 +122,7 @@ export default function VirtualTryonModal({
     // Clear canvas before drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw video frame with reduced opacity
+    // Draw video frame with specified opacity
     ctx.globalAlpha = 0.7; // Set opacity to 0.7 (70%)
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     ctx.globalAlpha = 1.0; // Reset opacity for subsequent drawings

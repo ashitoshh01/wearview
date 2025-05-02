@@ -172,7 +172,7 @@ export default function ContactSection() {
                     </div>
                     <div>
                       <h4 className="font-medium text-white/90">Email</h4>
-                      <p className="text-white/70">info@tryonverse.com</p>
+                      <p className="text-white/70">wearview@gmail.com</p>
                     </div>
                   </div>
                   
@@ -198,8 +198,8 @@ export default function ContactSection() {
                     <div>
                       <h4 className="font-medium text-white/90">Address</h4>
                       <p className="text-white/70">
-                        123 Tech Park, Digital Avenue<br />
-                        Bangalore, 560001, India
+                        DES Pune University<br />
+                        Pune, India
                       </p>
                     </div>
                   </div>

@@ -29,8 +29,20 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center space-x-6">
-          <nav className="hidden md:flex items-center gap-6">
+        {/* Logo - now on left side */}
+        <div className="flex items-center gap-2">
+          <a href="#" className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png" 
+              alt="WearView Logo" 
+              className="h-8" 
+            />
+          </a>
+        </div>
+        
+        {/* Navigation links, cart and theme toggle - now on right side */}
+        <div className="hidden md:flex items-center space-x-6">
+          <nav className="flex items-center gap-6">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -59,16 +71,7 @@ export default function Navbar() {
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <a href="#" className="flex items-center gap-2">
-            <img 
-              src="/lovable-uploads/340a34f0-e9ff-4e04-b814-c770e270e5d2.png" 
-              alt="WearView Logo" 
-              className="h-8" 
-            />
-          </a>
-        </div>
-        
+        {/* Mobile menu button */}
         <Button variant="outline" className="md:hidden" onClick={toggleMobileMenu}>
           <span className="sr-only">Toggle menu</span>
           {isMobileMenuOpen ? (

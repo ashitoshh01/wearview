@@ -25,7 +25,7 @@ export default function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 rounded-full py-6 animate-bounce" asChild>
+            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 rounded-full py-6" asChild>
               <a href="#shop">Try It Now</a>
             </Button>
             <Button 
@@ -41,7 +41,7 @@ export default function HeroSection() {
       </div>
       
       {/* Scroll indicator - with slower animation */}
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce" style={{ animationDuration: '3s' }}>
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center" style={{ animation: 'moveUpDown 3s ease-in-out infinite' }}>
         <div className={`w-10 h-14 border-2 ${theme === 'dark' ? 'border-gray-400' : 'border-gray-400'} rounded-full flex justify-center transition-colors duration-300`}>
           <div className={`w-1.5 h-3 ${theme === 'dark' ? 'bg-gray-400' : 'bg-gray-400'} rounded-full mt-2 transition-colors duration-300`} />
         </div>

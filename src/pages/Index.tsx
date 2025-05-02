@@ -57,6 +57,14 @@ const Index = () => {
           opacity: 1 !important;
           transform: translateY(0) !important;
         }
+        @keyframes moveUpDown {
+          0%, 100% {
+            transform: translate(-50%, 0);
+          }
+          50% {
+            transform: translate(-50%, -15px);
+          }
+        }
       `}</style>
     </ThemeProvider>
   );
