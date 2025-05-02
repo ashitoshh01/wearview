@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@
 import { Button } from "@/components/ui/button";
 import { Product } from "@/data/products";
 import { Camera, X } from "lucide-react";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VirtualTryonModalProps {
   product: Product;
@@ -16,7 +16,7 @@ export default function VirtualTryonModal({ product, isOpen, onClose }: VirtualT
   const [cameraActive, setCameraActive] = useState(false);
   const [streamActive, setStreamActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
   const [productOpacity, setProductOpacity] = useState(0.7);
   
   const handleStartCamera = async () => {
