@@ -1,192 +1,210 @@
-
-import { useState, useEffect, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, DialogDescription } from "@/components/ui/dialog";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Product } from "@/data/products";
-import { Camera, X } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/components/ui/use-toast";
+import { Camera, CameraOff } from "lucide-react";
 
 interface VirtualTryonModalProps {
-  product: Product;
+  product: Product | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function VirtualTryonModal({ product, isOpen, onClose }: VirtualTryonModalProps) {
-  const [cameraActive, setCameraActive] = useState(false);
-  const [streamActive, setStreamActive] = useState(false);
+export default function VirtualTryonModal({
+  product,
+  isOpen,
+  onClose,
+}: VirtualTryonModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const isMobile = useIsMobile();
-  const [productOpacity, setProductOpacity] = useState(0.7);
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [overlayImage, setOverlayImage] = useState<HTMLImageElement | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
   
-  const handleStartCamera = async () => {
-    try {
-      const constraints = {
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: isMobile ? "environment" : "user"
-        }
-      };
-      
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(err => console.error("Error playing video:", err));
-        setCameraActive(true);
-        setStreamActive(true);
-      }
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-    }
-  };
-  
-  const handleStopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-      tracks.forEach(track => track.stop());
-      videoRef.current.srcObject = null;
-      setCameraActive(false);
-      setStreamActive(false);
-    }
-  };
-  
-  // Toggle product opacity on click
-  const toggleProductOpacity = () => {
-    setProductOpacity(productOpacity === 0.7 ? 0.4 : 0.7);
-  };
-  
-  // Handle drag functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setStartPosition({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    });
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    setStartPosition({
-      x: e.touches[0].clientX - position.x,
-      y: e.touches[0].clientY - position.y,
-    });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setPosition({
-      x: e.clientX - startPosition.x,
-      y: e.clientY - startPosition.y,
-    });
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    setPosition({
-      x: e.touches[0].clientX - startPosition.x,
-      y: e.touches[0].clientY - startPosition.y,
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-  
-  // Clean up camera stream when dialog closes
+  // Load the overlay image
   useEffect(() => {
-    if (!isOpen && streamActive) {
-      handleStopCamera();
+    if (product?.virtualTryOnImage && isOpen) {
+      const img = new Image();
+      img.src = product.virtualTryOnImage;
+      img.onload = () => {
+        setOverlayImage(img);
+      };
     }
     
     return () => {
-      if (streamActive) {
-        handleStopCamera();
-      }
+      setOverlayImage(null);
     };
-  }, [isOpen, streamActive]);
-
-  // Add event listeners for drag
+  }, [product, isOpen]);
+  
+  // Handle camera activation
   useEffect(() => {
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('touchend', handleMouseUp);
+    if (isOpen) {
+      startCamera();
+    } else {
+      stopCamera();
+    }
+    
     return () => {
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchend', handleMouseUp);
+      stopCamera();
     };
-  }, []);
+  }, [isOpen]);
+  
+  // Handle canvas drawing
+  useEffect(() => {
+    if (isCameraActive && videoRef.current && canvasRef.current && overlayImage) {
+      const interval = setInterval(() => {
+        drawToCanvas();
+      }, 33); // ~30fps
+      
+      return () => clearInterval(interval);
+    }
+  }, [isCameraActive, overlayImage]);
+  
+  const startCamera = async () => {
+    setIsProcessing(true);
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" },
+        audio: false,
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        setStream(mediaStream);
+        setIsCameraActive(true);
+      }
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+      toast({
+        title: "Camera access denied",
+        description: "Please enable camera access to use virtual try-on",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    
+    setIsCameraActive(false);
+  };
+  
+  const drawToCanvas = () => {
+    if (!canvasRef.current || !videoRef.current || !overlayImage) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Set canvas dimensions to match video dimensions for proper display
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    
+    // Clear canvas before drawing
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw video frame with specified opacity
+    ctx.globalAlpha = 0.7; // Set opacity to 0.7 (70%)
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    ctx.globalAlpha = 1.0; // Reset opacity for subsequent drawings
+    
+    // Calculate overlay position (centered in middle of frame)
+    const overlayWidth = canvas.width * 0.6; // Scale overlay to 60% of canvas width
+    const overlayHeight = (overlayImage.height / overlayImage.width) * overlayWidth;
+    
+    // Position for different product categories
+    let xOffset = 0;
+    let yOffset = 0;
+    
+    if (product?.category === 'accessories') {
+      // Position accessories (including sunglasses) on face (higher up)
+      xOffset = (canvas.width - overlayWidth) / 2;
+      yOffset = canvas.height * 0.2; // Position at upper 20% of screen
+    } else {
+      // Default position for shirts, hoodies, jackets
+      xOffset = (canvas.width - overlayWidth) / 2;
+      yOffset = canvas.height * 0.35;
+    }
+    
+    // Draw overlay
+    ctx.drawImage(overlayImage, xOffset, yOffset, overlayWidth, overlayHeight);
+    
+    // Add instruction text
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+    ctx.fillStyle = 'white';
+    ctx.font = '16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Adjust yourself to virtually try the item', canvas.width / 2, canvas.height - 15);
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) onClose();
-    }}>
-      <DialogContent className="sm:max-w-lg">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Virtual Try-On: {product.name}</DialogTitle>
-          <DialogDescription>Position the item by dragging it, and click to adjust opacity</DialogDescription>
-          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
+          <DialogTitle>Virtual Try-On: {product?.name}</DialogTitle>
+          <DialogDescription>
+            Use your camera to see how this item looks on you
+          </DialogDescription>
         </DialogHeader>
         
-        <div className="relative aspect-video bg-black rounded-md overflow-hidden">
-          {!cameraActive ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Button onClick={handleStartCamera}>
-                <Camera className="mr-2 h-4 w-4" /> Start Camera
+        <div className="relative aspect-video bg-muted rounded-md overflow-hidden">
+          <video 
+            ref={videoRef} 
+            autoPlay 
+            playsInline 
+            muted 
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <canvas 
+            ref={canvasRef} 
+            className="absolute inset-0 w-full h-full object-cover z-10"
+          />
+          
+          {!isCameraActive && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
+              <Button onClick={startCamera} disabled={isProcessing}>
+                {isProcessing ? (
+                  "Accessing camera..."
+                ) : (
+                  <>
+                    <Camera className="mr-2 h-4 w-4" /> Enable Camera
+                  </>
+                )}
               </Button>
             </div>
-          ) : (
-            <>
-              <video 
-                ref={videoRef} 
-                autoPlay 
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-                style={{ display: "block" }}
-              />
-              <div 
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ 
-                  pointerEvents: 'auto', 
-                  cursor: isDragging ? 'grabbing' : 'grab',
-                  transform: `translate(${position.x}px, ${position.y}px)`
-                }}
-                onClick={toggleProductOpacity}
-                onMouseDown={handleMouseDown}
-                onTouchStart={handleTouchStart}
-                onMouseMove={handleMouseMove}
-                onTouchMove={handleTouchMove}
-              >
-                <img 
-                  src={product.imageSrc} 
-                  alt={product.name}
-                  className="max-h-full max-w-full object-contain"
-                  style={{ 
-                    opacity: productOpacity, 
-                    userSelect: 'none',
-                    pointerEvents: 'none'
-                  }}
-                  draggable="false"
-                />
-              </div>
-              <Button 
-                variant="destructive" 
-                size="sm"
-                className="absolute bottom-4 right-4"
-                onClick={handleStopCamera}
-              >
-                Stop Camera
-              </Button>
-            </>
           )}
         </div>
+        
+        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+          {isCameraActive && (
+            <Button variant="outline" onClick={stopCamera} className="sm:mr-auto">
+              <CameraOff className="mr-2 h-4 w-4" /> Turn Off Camera
+            </Button>
+          )}
+          <Button variant="default" onClick={onClose}>
+            Close
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
 import { MinusCircle, PlusCircle, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { SheetFooter, SheetClose } from "@/components/ui/sheet";
 
 export default function CartSection() {
   const { items, removeFromCart, increaseQuantity, decreaseQuantity, clearCart, getTotalPrice } = useCartStore();
@@ -26,16 +25,16 @@ export default function CartSection() {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 py-6">
+    <section id="cart" className="py-16">
+      <div className="container">
+        <h2 className="text-3xl font-bold mb-8">Your Cart</h2>
+        
         {items.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-xl text-muted-foreground mb-4">Your cart is empty</p>
-            <SheetClose asChild>
-              <Button asChild>
-                <a href="#shop">Continue Shopping</a>
-              </Button>
-            </SheetClose>
+            <Button asChild>
+              <a href="#shop">Continue Shopping</a>
+            </Button>
           </div>
         ) : (
           <div className="space-y-8">
@@ -96,38 +95,30 @@ export default function CartSection() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
-      </div>
-      
-      {items.length > 0 && (
-        <div className="border-t pt-4 mt-auto">
-          <div className="flex justify-between mb-4">
-            <span className="font-medium">Total</span>
-            <span className="font-bold">{formatPrice(getTotalPrice())}</span>
-          </div>
-          
-          <SheetFooter>
-            <div className="flex w-full gap-4">
-              <Button 
-                variant="outline" 
-                onClick={clearCart}
-                className="flex-1"
-              >
-                Clear Cart
-              </Button>
-              <SheetClose asChild>
+            
+            <div className="border-t pt-4">
+              <div className="flex justify-between mb-4">
+                <span className="font-medium">Total</span>
+                <span className="font-bold">{formatPrice(getTotalPrice())}</span>
+              </div>
+              
+              <div className="flex justify-end gap-4">
+                <Button 
+                  variant="outline" 
+                  onClick={clearCart}
+                >
+                  Clear Cart
+                </Button>
                 <Button 
                   onClick={handleCheckout}
-                  className="flex-1"
                 >
                   Checkout
                 </Button>
-              </SheetClose>
+              </div>
             </div>
-          </SheetFooter>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
