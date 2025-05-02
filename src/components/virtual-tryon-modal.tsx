@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -80,6 +81,7 @@ export default function VirtualTryonModal({
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        videoRef.current.muted = true; // Ensure video is muted
         setStream(mediaStream);
         setIsCameraActive(true);
       }
@@ -116,8 +118,8 @@ export default function VirtualTryonModal({
     if (!ctx) return;
     
     // Set canvas dimensions to match video dimensions for proper display
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
+    canvas.width = videoRef.current.videoWidth || 640;
+    canvas.height = videoRef.current.videoHeight || 480;
     
     // Clear canvas before drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -139,8 +141,12 @@ export default function VirtualTryonModal({
       // Position accessories (including sunglasses) on face (higher up)
       xOffset = (canvas.width - overlayWidth) / 2;
       yOffset = canvas.height * 0.2; // Position at upper 20% of screen
+    } else if (product?.category === 'jackets') {
+      // Special position for jackets to better fit the user
+      xOffset = (canvas.width - overlayWidth) / 2;
+      yOffset = canvas.height * 0.3; // Position at 30% of screen height
     } else {
-      // Default position for shirts, hoodies, jackets
+      // Default position for shirts, hoodies, etc.
       xOffset = (canvas.width - overlayWidth) / 2;
       yOffset = canvas.height * 0.35;
     }
@@ -174,10 +180,12 @@ export default function VirtualTryonModal({
             playsInline 
             muted 
             className="absolute inset-0 w-full h-full object-cover"
+            style={{ display: isCameraActive ? 'block' : 'none' }}
           />
           <canvas 
             ref={canvasRef} 
             className="absolute inset-0 w-full h-full object-cover z-10"
+            style={{ display: isCameraActive ? 'block' : 'none' }}
           />
           
           {!isCameraActive && (

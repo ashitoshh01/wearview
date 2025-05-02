@@ -7,7 +7,7 @@ export default function HeroSection() {
   const { theme } = useTheme();
 
   return (
-    <section id="home" className="relative overflow-hidden h-screen flex items-center">
+    <section id="home" className="relative overflow-hidden h-screen flex items-center pt-0">
       {/* Background based on theme */}
       <div className={`absolute inset-0 ${theme === 'dark' ? 'bg-gradient-to-br from-gray-900 to-purple-950' : 'bg-gradient-to-br from-white to-purple-50'} -z-20 transition-colors duration-300`} />
       

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./theme-toggle";
 import { ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/stores/cart-store";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import CartSection from "./cart-section";
 
 interface NavLink {
   title: string;
@@ -33,14 +35,14 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <a href="#" className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png" 
+              src="/lovable-uploads/f24dac1a-5928-4478-be11-4b1a178ac947.png" 
               alt="WearView Logo" 
-              className="h-8" 
+              className="h-12" 
             />
           </a>
         </div>
         
-        {/* Navigation links, cart and theme toggle - now on right side */}
+        {/* Navigation links - center aligned */}
         <div className="hidden md:flex items-center space-x-6">
           <nav className="flex items-center gap-6">
             {navLinks.map((link) => (
@@ -53,12 +55,15 @@ export default function Navbar() {
               </a>
             ))}
           </nav>
+        </div>
           
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            
-            <Button variant="outline" size="icon" className="relative" asChild>
-              <a href="#cart">
+        {/* Cart and theme toggle - now on right side */}
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 {items.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
@@ -66,27 +71,30 @@ export default function Navbar() {
                   </span>
                 )}
                 <span className="sr-only">Cart</span>
-              </a>
-            </Button>
-          </div>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
+              <CartSection />
+            </SheetContent>
+          </Sheet>
+          
+          {/* Mobile menu button */}
+          <Button variant="outline" className="md:hidden" onClick={toggleMobileMenu}>
+            <span className="sr-only">Toggle menu</span>
+            {isMobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="4" y1="18" x2="20" y2="18"></line>
+              </svg>
+            )}
+          </Button>
         </div>
-        
-        {/* Mobile menu button */}
-        <Button variant="outline" className="md:hidden" onClick={toggleMobileMenu}>
-          <span className="sr-only">Toggle menu</span>
-          {isMobileMenuOpen ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-              <line x1="4" y1="12" x2="20" y2="12"></line>
-              <line x1="4" y1="6" x2="20" y2="6"></line>
-              <line x1="4" y1="18" x2="20" y2="18"></line>
-            </svg>
-          )}
-        </Button>
       </div>
       
       {/* Mobile menu */}

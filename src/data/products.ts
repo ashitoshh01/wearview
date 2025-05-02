@@ -31,7 +31,7 @@ export const products: Product[] = [
     category: "jackets",
     price: 4999,
     imageSrc: "/lovable-uploads/b2b96b2d-ec58-48a4-92cb-6f55f7518018.png",
-    virtualTryOnImage: "/lovable-uploads/b2b96b2d-ec58-48a4-92cb-6f55f7518018.png"
+    virtualTryOnImage: "/lovable-uploads/c996a3bf-e073-46ce-9eaf-94f66601703d.png"
   },
   {
     id: "sets-1",
