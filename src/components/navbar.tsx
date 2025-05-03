@@ -31,20 +31,21 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        {/* Logo - now on left side */}
-        <div className="flex items-center gap-2">
-          <a href="#" className="flex items-center gap-2">
+        {/* Logo - on left side with increased size */}
+        <div className="flex items-center">
+          <a href="#" className="flex items-center">
             <img 
               src="/lovable-uploads/f24dac1a-5928-4478-be11-4b1a178ac947.png" 
               alt="WearView Logo" 
-              className="h-12" 
+              className="h-16" 
             />
           </a>
         </div>
         
-        {/* Navigation links - center aligned */}
-        <div className="hidden md:flex items-center space-x-6">
-          <nav className="flex items-center gap-6">
+        {/* Navigation links, cart and theme toggle - all on right side */}
+        <div className="flex items-center space-x-6">
+          {/* Navigation links - hidden on mobile */}
+          <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -55,28 +56,28 @@ export default function Navbar() {
               </a>
             ))}
           </nav>
-        </div>
           
-        {/* Cart and theme toggle - now on right side */}
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                {items.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
-                    {items.length}
-                  </span>
-                )}
-                <span className="sr-only">Cart</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
-              <CartSection />
-            </SheetContent>
-          </Sheet>
+          {/* Theme toggle and cart */}
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  {items.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                      {items.length}
+                    </span>
+                  )}
+                  <span className="sr-only">Cart</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
+                <CartSection />
+              </SheetContent>
+            </Sheet>
+          </div>
           
           {/* Mobile menu button */}
           <Button variant="outline" className="md:hidden" onClick={toggleMobileMenu}>
