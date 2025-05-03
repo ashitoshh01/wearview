@@ -167,7 +167,7 @@ export default function VirtualTryonModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Virtual Try-On: {product?.name}</DialogTitle>
+          <DialogTitle>WearView: {product?.name}</DialogTitle>
           <DialogDescription>
             Use your camera to see how this item looks on you
           </DialogDescription>
