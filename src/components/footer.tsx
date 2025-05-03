@@ -9,7 +9,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-violet-500">
-                TryonVerse
+                WearView
               </span>
             </div>
             <p className="text-muted-foreground mb-4 max-w-md">
@@ -17,7 +17,7 @@ export default function Footer() {
               virtual try-on technology. See how products look on you before you buy.
             </p>
             <p className="text-sm text-muted-foreground">
-              © {currentYear} TryonVerse. All rights reserved.
+              © {currentYear} WearView. All rights reserved.
             </p>
           </div>
           
@@ -83,7 +83,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a 
-                href="#" 
+                href="https://www.linkedin.com/in/ashitosh01/" 
                 className="w-8 h-8 rounded-full flex items-center justify-center border border-border hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="LinkedIn"
               >
