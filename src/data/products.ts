@@ -55,7 +55,7 @@ export const products: Product[] = [
     category: "accessories",
     price: 2999,
     imageSrc: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80",
-    virtualTryOnImage: "/lovable-uploads/4a466ac0-955d-4dbd-a78c-f9cadc19e90d.png"
+    virtualTryOnImage: "/lovable-uploads/821267e1-a504-4672-8b72-16d0ad2a729f.png"
   },
   {
     id: "jacket-2",
