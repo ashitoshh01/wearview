@@ -4,7 +4,7 @@ import { products, Product } from "@/data/products";
 import ProductCard from "./product-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type Category = 'all' | 'shirts' | 'pants' | 'accessories' | 'hoodies' | 'jackets' | 'sets';
+type Category = 'all' | 'shirts' | 'pants' | 'accessories' | 'hoodies' | 'jackets';
 
 export default function ShopSection() {
   const [activeCategory, setActiveCategory] = useState<Category>('all');
@@ -18,7 +18,6 @@ export default function ShopSection() {
     { value: 'hoodies', label: 'Hoodies' },
     { value: 'jackets', label: 'Jackets' },
     { value: 'accessories', label: 'Accessories' },
-    { value: 'sets', label: 'Sets' }
   ];
   
   useEffect(() => {
