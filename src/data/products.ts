@@ -35,7 +35,7 @@ export const products: Product[] = [
   },
   {
     id: "sets-1",
-    name: "Palm Pattern Set",
+    name: "White T-Shirt",
     category: "sets",
     price: 3499,
     imageSrc: "/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png",
@@ -43,7 +43,7 @@ export const products: Product[] = [
   },
   {
     id: "shirt-1",
-    name: "Basic White T-Shirt",
+    name: "Summer wear",
     category: "shirts",
     price: 1199,
     imageSrc: "/lovable-uploads/197ce515-f0d4-4ca5-b090-2f1a1ef3218b.png",
@@ -51,7 +51,7 @@ export const products: Product[] = [
   },
   {
     id: "accessories-1",
-    name: "Designer Sunglasses",
+    name: "Sunglasses",
     category: "accessories",
     price: 2999,
     imageSrc: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80",
