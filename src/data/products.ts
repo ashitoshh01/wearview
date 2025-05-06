@@ -36,7 +36,7 @@ export const products: Product[] = [
   {
     id: "sets-1",
     name: "White T-Shirt",
-    category: "sets",
+    category: "shirts",
     price: 3499,
     imageSrc: "/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png",
     virtualTryOnImage: "/lovable-uploads/76a597d2-fe97-4ac9-8c7e-07f2a08adbbd.png"
