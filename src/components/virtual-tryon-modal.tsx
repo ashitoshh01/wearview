@@ -45,6 +45,7 @@ export default function VirtualTryonModal({
         setIsProcessing(true);
         try {
           // Load TensorFlow.js
+          await tf.setBackend('webgl');
           await tf.ready();
           console.log("TensorFlow.js loaded successfully");
           
@@ -276,21 +277,79 @@ export default function VirtualTryonModal({
     if (faces.length > 0) {
       const face = faces[0]; // Use the first face detected
       
-      // Log keypoints for debugging
-      console.log('Face keypoints available:', face.keypoints.some(point => point.name === "leftEye"));
+      // Extract all keypoints for debugging
+      const allKeypoints = face.keypoints;
+      const keypointNames = allKeypoints.map(kp => kp.name);
+      console.log("Available keypoints:", keypointNames);
       
       // Handle different product categories
       if (product?.category === 'accessories') {
         // For sunglasses, position based on eyes
         if (product?.name === "Sunglasses") {
-          // Extract key landmarks for positioning
-          const keypoints = face.keypoints;
-          const leftEye = keypoints.find(point => point.name === "leftEye");
-          const rightEye = keypoints.find(point => point.name === "rightEye");
+          // Find eye landmarks
+          const leftEye = face.keypoints.find(p => p.name === "leftEye");
+          const rightEye = face.keypoints.find(p => p.name === "rightEye");
           
-          if (leftEye && rightEye) {
+          if (!leftEye || !rightEye) {
+            // If eye landmarks not available by name, try to find by index
+            // MediaPipe face mesh has eyes around these indices
+            const allPoints = face.keypoints;
+            if (allPoints.length > 100) {
+              // Approximate eye positions from other landmarks
+              const leftEyeRegion = allPoints.filter((_, idx) => idx >= 130 && idx <= 150);
+              const rightEyeRegion = allPoints.filter((_, idx) => idx >= 360 && idx <= 380);
+              
+              if (leftEyeRegion.length > 0 && rightEyeRegion.length > 0) {
+                // Create synthetic eye points from averages
+                const leftEyePoint = { 
+                  x: leftEyeRegion.reduce((sum, p) => sum + p.x, 0) / leftEyeRegion.length,
+                  y: leftEyeRegion.reduce((sum, p) => sum + p.y, 0) / leftEyeRegion.length,
+                  z: leftEyeRegion.reduce((sum, p) => sum + (p.z || 0), 0) / leftEyeRegion.length,
+                };
+                
+                const rightEyePoint = { 
+                  x: rightEyeRegion.reduce((sum, p) => sum + p.x, 0) / rightEyeRegion.length,
+                  y: rightEyeRegion.reduce((sum, p) => sum + p.y, 0) / rightEyeRegion.length,
+                  z: rightEyeRegion.reduce((sum, p) => sum + (p.z || 0), 0) / rightEyeRegion.length,
+                };
+                
+                shouldApplyTracking = true;
+                console.log("Using synthetic eye points", leftEyePoint, rightEyePoint);
+                
+                // Calculate the center point between eyes
+                const eyeDistance = Math.sqrt(
+                  Math.pow(rightEyePoint.x - leftEyePoint.x, 2) + 
+                  Math.pow(rightEyePoint.y - leftEyePoint.y, 2)
+                );
+                
+                // Size the sunglasses based on the distance between eyes
+                overlayWidth = eyeDistance * 2.5; // Adjust this multiplier as needed
+                overlayHeight = (overlayImage.height / overlayImage.width) * overlayWidth;
+                
+                // Position overlay centered between the eyes, slightly higher
+                xOffset = (leftEyePoint.x + rightEyePoint.x) / 2 - overlayWidth / 2;
+                yOffset = (leftEyePoint.y + rightEyePoint.y) / 2 - overlayHeight * 0.6;
+                
+                // Adjust rotation if needed based on eye positions
+                const angle = Math.atan2(rightEyePoint.y - leftEyePoint.y, rightEyePoint.x - leftEyePoint.x);
+                
+                // Apply rotation if angle is not zero
+                if (angle !== 0) {
+                  ctx.save();
+                  ctx.translate(xOffset + overlayWidth / 2, yOffset + overlayHeight / 2);
+                  ctx.rotate(angle);
+                  ctx.drawImage(overlayImage, -overlayWidth / 2, -overlayHeight / 2, overlayWidth, overlayHeight);
+                  ctx.restore();
+                  
+                  // Skip the regular drawing since we've already drawn with rotation
+                  shouldApplyTracking = false;
+                }
+              }
+            }
+          } else {
+            // Use the detected eye landmarks
             shouldApplyTracking = true;
-            console.log("Positioning sunglasses between eyes:", leftEye, rightEye);
+            console.log("Using detected eye landmarks", leftEye, rightEye);
             
             // Calculate the center point between eyes
             const eyeDistance = Math.sqrt(
@@ -304,7 +363,7 @@ export default function VirtualTryonModal({
             
             // Position overlay centered between the eyes, slightly higher
             xOffset = (leftEye.x + rightEye.x) / 2 - overlayWidth / 2;
-            yOffset = (leftEye.y + rightEye.y) / 2 - overlayHeight * 0.6; // Adjust vertical position
+            yOffset = (leftEye.y + rightEye.y) / 2 - overlayHeight * 0.6;
             
             // Adjust rotation if needed based on eye positions
             const angle = Math.atan2(rightEye.y - leftEye.y, rightEye.x - leftEye.x);
@@ -317,14 +376,9 @@ export default function VirtualTryonModal({
               ctx.drawImage(overlayImage, -overlayWidth / 2, -overlayHeight / 2, overlayWidth, overlayHeight);
               ctx.restore();
               
-              // Log that we applied rotation
-              console.log("Applied sunglasses with rotation:", angle);
-              
               // Skip the regular drawing since we've already drawn with rotation
               shouldApplyTracking = false;
             }
-          } else {
-            console.log("Eye keypoints not found in face landmarks");
           }
         } else {
           // For other accessories, adjust based on face position
@@ -339,19 +393,19 @@ export default function VirtualTryonModal({
         }
       } else if (product?.category === 'jackets' || product?.category === 'hoodies') {
         // For jackets and hoodies, position based on shoulders and body
-        const nose = face.keypoints.find(point => point.name === "noseTip");
-        if (nose) {
+        const noseTip = face.keypoints.find(point => point.name === "noseTip");
+        if (noseTip) {
           shouldApplyTracking = true;
           
           // Calculate position relative to nose
-          const noseX = nose.x;
-          const noseY = nose.y;
+          const noseX = noseTip.x;
+          const noseY = noseTip.y;
           
           // Center the jacket horizontally with the nose
           xOffset = noseX - (overlayWidth / 2);
           
           // Position the jacket below the face
-          yOffset = noseY + (overlayHeight * 0.1); // Adjust this value as needed
+          yOffset = noseY + (overlayHeight * 0.1);
         }
       } else if (product?.category === 'shirts') {
         // For shirts, position based on chest area
@@ -367,7 +421,7 @@ export default function VirtualTryonModal({
           xOffset = noseX - (overlayWidth / 2);
           
           // Position the shirt below the face
-          yOffset = noseY + (overlayHeight * 0.15); // Adjust this value as needed
+          yOffset = noseY + (overlayHeight * 0.15);
         }
       }
     }
@@ -390,7 +444,7 @@ export default function VirtualTryonModal({
     }
     
     // Draw overlay if not already drawn with rotation
-    if (shouldApplyTracking || !faces.length) {
+    if (shouldApplyTracking || faces.length === 0) {
       ctx.drawImage(overlayImage, xOffset, yOffset, overlayWidth, overlayHeight);
     }
     
