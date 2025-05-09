@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,7 @@ export default function VirtualTryonModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [faceDetector, setFaceDetector] = useState<faceLandmarksDetection.FaceLandmarksDetector | null>(null);
   const [isFaceTracking, setIsFaceTracking] = useState(false);
+  const [faceDetected, setFaceDetected] = useState(false);
   const animationFrameId = useRef<number | null>(null);
   const { toast } = useToast();
   
@@ -44,17 +46,21 @@ export default function VirtualTryonModal({
         try {
           // Load TensorFlow.js
           await tf.ready();
+          console.log("TensorFlow.js loaded successfully");
           
           // Load Face Landmarks Detection model
           const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
           const detectorConfig = {
             runtime: 'tfjs',
             refineLandmarks: true,
+            maxFaces: 1,
           } as faceLandmarksDetection.MediaPipeFaceMeshTfjsModelConfig;
           
+          console.log("Creating face detector with config:", detectorConfig);
           const detector = await faceLandmarksDetection.createDetector(
             model, detectorConfig
           );
+          console.log("Face detector created successfully");
           
           setFaceDetector(detector);
           setIsFaceTracking(true);
@@ -120,12 +126,19 @@ export default function VirtualTryonModal({
     
     const detectAndDraw = async () => {
       if (!isActive || !isCameraActive || !videoRef.current || !canvasRef.current || !overlayImage || !faceDetector) {
+        if (animationFrameId.current) {
+          cancelAnimationFrame(animationFrameId.current);
+        }
         return;
       }
       
       try {
         // Detect faces
         const faces = await faceDetector.estimateFaces(videoRef.current);
+        console.log("Face detection result:", faces.length > 0 ? "Face detected" : "No face detected", faces);
+        
+        // Update face detected state
+        setFaceDetected(faces.length > 0);
         
         // Draw the frame with face tracking if available
         drawToCanvas(faces);
@@ -134,11 +147,16 @@ export default function VirtualTryonModal({
         animationFrameId.current = requestAnimationFrame(detectAndDraw);
       } catch (error) {
         console.error('Face detection error:', error);
+        // Continue the loop even if there's an error
+        animationFrameId.current = requestAnimationFrame(detectAndDraw);
       }
     };
     
     const drawWithoutTracking = () => {
       if (!isActive || !isCameraActive || !videoRef.current || !canvasRef.current || !overlayImage) {
+        if (animationFrameId.current) {
+          cancelAnimationFrame(animationFrameId.current);
+        }
         return;
       }
       
@@ -151,8 +169,10 @@ export default function VirtualTryonModal({
     
     // Start the appropriate drawing loop
     if (isFaceTracking && faceDetector) {
+      console.log("Starting face tracking detection loop");
       detectAndDraw();
     } else if (isCameraActive && overlayImage) {
+      console.log("Starting non-tracking drawing loop");
       drawWithoutTracking();
     }
     
@@ -160,6 +180,7 @@ export default function VirtualTryonModal({
       isActive = false;
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
+        animationFrameId.current = null;
       }
     };
   }, [isCameraActive, overlayImage, faceDetector, isFaceTracking]);
@@ -175,8 +196,21 @@ export default function VirtualTryonModal({
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         videoRef.current.muted = true; // Ensure video is muted
-        setStream(mediaStream);
-        setIsCameraActive(true);
+        
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play().then(() => {
+              console.log("Video playing, camera activated");
+              setStream(mediaStream);
+              setIsCameraActive(true);
+              setIsProcessing(false);
+            }).catch(err => {
+              console.error("Error playing video:", err);
+              setIsProcessing(false);
+            });
+          }
+        };
       }
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -185,7 +219,6 @@ export default function VirtualTryonModal({
         description: "Please enable camera access to use virtual try-on",
         variant: "destructive",
       });
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -216,8 +249,13 @@ export default function VirtualTryonModal({
     if (!ctx) return;
     
     // Set canvas dimensions to match video dimensions for proper display
-    canvas.width = videoRef.current.videoWidth || 640;
-    canvas.height = videoRef.current.videoHeight || 480;
+    if (videoRef.current.videoWidth && videoRef.current.videoHeight) {
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+    } else {
+      canvas.width = 640;
+      canvas.height = 480;
+    }
     
     // Clear canvas before drawing
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -232,57 +270,110 @@ export default function VirtualTryonModal({
     let yOffset = 0;
     let overlayWidth = canvas.width * 0.6; // Scale overlay to 60% of canvas width
     let overlayHeight = (overlayImage.height / overlayImage.width) * overlayWidth;
+    let shouldApplyTracking = false;
     
-    // If we have face tracking and there's at least one face detected
-    if (faces.length > 0 && product?.category === 'accessories') {
+    // Check if we have face tracking and there's at least one face detected
+    if (faces.length > 0) {
       const face = faces[0]; // Use the first face detected
       
-      // For sunglasses, position based on eyes
-      if (product?.name === "Sunglasses") {
-        // Get key landmarks for positioning
-        const leftEye = face.keypoints.find(point => point.name === "leftEye");
-        const rightEye = face.keypoints.find(point => point.name === "rightEye");
-        const noseTip = face.keypoints.find(point => point.name === "noseTip");
-        
-        if (leftEye && rightEye) {
-          // Calculate the center point between eyes
-          const eyeDistance = Math.sqrt(
-            Math.pow(rightEye.x - leftEye.x, 2) + 
-            Math.pow(rightEye.y - leftEye.y, 2)
-          );
+      // Log keypoints for debugging
+      console.log('Face keypoints available:', face.keypoints.some(point => point.name === "leftEye"));
+      
+      // Handle different product categories
+      if (product?.category === 'accessories') {
+        // For sunglasses, position based on eyes
+        if (product?.name === "Sunglasses") {
+          // Extract key landmarks for positioning
+          const keypoints = face.keypoints;
+          const leftEye = keypoints.find(point => point.name === "leftEye");
+          const rightEye = keypoints.find(point => point.name === "rightEye");
           
-          // Size the sunglasses based on the distance between eyes
-          overlayWidth = eyeDistance * 2.5; // Adjust this multiplier as needed
-          overlayHeight = (overlayImage.height / overlayImage.width) * overlayWidth;
-          
-          // Position overlay centered between the eyes, slightly higher
-          xOffset = (leftEye.x + rightEye.x) / 2 - overlayWidth / 2;
-          yOffset = (leftEye.y + rightEye.y) / 2 - overlayHeight * 0.6; // Adjust vertical position
-          
-          // Adjust rotation if needed based on eye positions
-          const angle = Math.atan2(rightEye.y - leftEye.y, rightEye.x - leftEye.x);
-          
-          // Apply rotation if needed
-          if (angle !== 0) {
-            ctx.save();
-            ctx.translate(xOffset + overlayWidth / 2, yOffset + overlayHeight / 2);
-            ctx.rotate(angle);
-            ctx.drawImage(overlayImage, -overlayWidth / 2, -overlayHeight / 2, overlayWidth, overlayHeight);
-            ctx.restore();
+          if (leftEye && rightEye) {
+            shouldApplyTracking = true;
+            console.log("Positioning sunglasses between eyes:", leftEye, rightEye);
+            
+            // Calculate the center point between eyes
+            const eyeDistance = Math.sqrt(
+              Math.pow(rightEye.x - leftEye.x, 2) + 
+              Math.pow(rightEye.y - leftEye.y, 2)
+            );
+            
+            // Size the sunglasses based on the distance between eyes
+            overlayWidth = eyeDistance * 2.5; // Adjust this multiplier as needed
+            overlayHeight = (overlayImage.height / overlayImage.width) * overlayWidth;
+            
+            // Position overlay centered between the eyes, slightly higher
+            xOffset = (leftEye.x + rightEye.x) / 2 - overlayWidth / 2;
+            yOffset = (leftEye.y + rightEye.y) / 2 - overlayHeight * 0.6; // Adjust vertical position
+            
+            // Adjust rotation if needed based on eye positions
+            const angle = Math.atan2(rightEye.y - leftEye.y, rightEye.x - leftEye.x);
+            
+            // Apply rotation if angle is not zero
+            if (angle !== 0) {
+              ctx.save();
+              ctx.translate(xOffset + overlayWidth / 2, yOffset + overlayHeight / 2);
+              ctx.rotate(angle);
+              ctx.drawImage(overlayImage, -overlayWidth / 2, -overlayHeight / 2, overlayWidth, overlayHeight);
+              ctx.restore();
+              
+              // Log that we applied rotation
+              console.log("Applied sunglasses with rotation:", angle);
+              
+              // Skip the regular drawing since we've already drawn with rotation
+              shouldApplyTracking = false;
+            }
           } else {
-            ctx.drawImage(overlayImage, xOffset, yOffset, overlayWidth, overlayHeight);
+            console.log("Eye keypoints not found in face landmarks");
           }
-          
-          // Skip the regular drawing since we've already drawn with rotation
-          return;
+        } else {
+          // For other accessories, adjust based on face position
+          const faceBox = face.box;
+          if (faceBox) {
+            shouldApplyTracking = true;
+            
+            // Position centered on face
+            xOffset = faceBox.xMin + (faceBox.width / 2) - (overlayWidth / 2);
+            yOffset = faceBox.yMin - (overlayHeight * 0.2); // Position slightly above the face
+          }
         }
-      } else {
-        // For other accessories, use default positioning
-        xOffset = (canvas.width - overlayWidth) / 2;
-        yOffset = canvas.height * 0.2;
+      } else if (product?.category === 'jackets' || product?.category === 'hoodies') {
+        // For jackets and hoodies, position based on shoulders and body
+        const nose = face.keypoints.find(point => point.name === "noseTip");
+        if (nose) {
+          shouldApplyTracking = true;
+          
+          // Calculate position relative to nose
+          const noseX = nose.x;
+          const noseY = nose.y;
+          
+          // Center the jacket horizontally with the nose
+          xOffset = noseX - (overlayWidth / 2);
+          
+          // Position the jacket below the face
+          yOffset = noseY + (overlayHeight * 0.1); // Adjust this value as needed
+        }
+      } else if (product?.category === 'shirts') {
+        // For shirts, position based on chest area
+        const nose = face.keypoints.find(point => point.name === "noseTip");
+        if (nose) {
+          shouldApplyTracking = true;
+          
+          // Calculate position relative to nose
+          const noseX = nose.x;
+          const noseY = nose.y;
+          
+          // Center the shirt horizontally with the nose
+          xOffset = noseX - (overlayWidth / 2);
+          
+          // Position the shirt below the face
+          yOffset = noseY + (overlayHeight * 0.15); // Adjust this value as needed
+        }
       }
-    } else {
-      // Default positioning logic when no face tracking available or for non-accessories
+    }
+    
+    // If no tracking applied or no face detected, use default positioning
+    if (!shouldApplyTracking) {
       if (product?.category === 'accessories') {
         // Position accessories (including sunglasses) on face (higher up)
         xOffset = (canvas.width - overlayWidth) / 2;
@@ -298,8 +389,10 @@ export default function VirtualTryonModal({
       }
     }
     
-    // Draw overlay
-    ctx.drawImage(overlayImage, xOffset, yOffset, overlayWidth, overlayHeight);
+    // Draw overlay if not already drawn with rotation
+    if (shouldApplyTracking || !faces.length) {
+      ctx.drawImage(overlayImage, xOffset, yOffset, overlayWidth, overlayHeight);
+    }
     
     // Add instruction text
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -327,7 +420,12 @@ export default function VirtualTryonModal({
           <DialogTitle>WearView: {product?.name}</DialogTitle>
           <DialogDescription>
             Use your camera to see how this item looks on you
-            {isFaceTracking && <span className="ml-1 text-green-600">(with face tracking)</span>}
+            {isFaceTracking && faceDetected && (
+              <span className="ml-1 text-green-600">(Face tracking active)</span>
+            )}
+            {isFaceTracking && !faceDetected && (
+              <span className="ml-1 text-amber-500">(Looking for face...)</span>
+            )}
           </DialogDescription>
         </DialogHeader>
         
